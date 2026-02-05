@@ -16,6 +16,7 @@ fields:
     selector:
       text:
     name: text
+    required: true
 variables:
   device_id: !input device_id
   device_entities: "{{ device_entities(device_id) }}"

@@ -27,6 +27,7 @@ fields:
           - "5"
           - "6"
     required: true
+    description: "Changes the time app style."
     default: unset
   TFORMAT:
     selector:
@@ -99,6 +100,7 @@ fields:
           - "true"
           - "false"
     required: true
+    description: "Enable or disable the native battery app (requires reboot)."
     default: unset
   WD:
     selector:
@@ -110,11 +112,12 @@ fields:
           - "true"
           - "false"
     required: true
+    description: "Enable or disable the weekday display."
     default: unset
 variables:
   device_id: !input device_id
   device_entities: "{{ device_entities(device_id) }}"
-  device_topic: "{{ (device_entities | select('search','device_topic') | list)[0] }}"
+  device_topic: "{{ (device_entities | select('search', 'device_topic') | list)[0] }}"
   device_topic_id: "{{ states(device_topic) }}"
   raw_strings:
     TFORMAT: "{{ TFORMAT }}"

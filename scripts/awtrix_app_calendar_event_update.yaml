@@ -19,7 +19,7 @@ blueprint:
 variables:
   device_id: !input device_id
   device_entities: "{{ device_entities(device_id) }}"
-  device_topic: "{{ (device_entities | select('search','device_topic') | list)[0] }}"
+  device_topic: "{{ (device_entities | select('search', 'device_topic') | list)[0] }}"
   device_topic_id: "{{ states(device_topic) }}"
   text: "{{ state_attr(calendar_id, 'message') }}"
   start_time: "{{ state_attr(calendar_id, 'start_time') }}"

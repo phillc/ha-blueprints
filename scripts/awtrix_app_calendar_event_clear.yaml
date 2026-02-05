@@ -14,7 +14,7 @@ blueprint:
 variables:
   device_id: !input device_id
   device_entities: "{{ device_entities(device_id) }}"
-  device_topic: "{{ (device_entities | select('search','device_topic') | list)[0] }}"
+  device_topic: "{{ (device_entities | select('search', 'device_topic') | list)[0] }}"
   device_topic_id: "{{ states(device_topic) }}"
 
 sequence:
