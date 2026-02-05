@@ -1,6 +1,7 @@
 blueprint:
   name: Awtrix App - Calendar Event - Update
   domain: script
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_app_calendar_event_update.yaml
 
   input:
     device_id:

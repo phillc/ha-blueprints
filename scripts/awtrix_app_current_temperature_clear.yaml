@@ -1,6 +1,7 @@
 blueprint:
   name: Awtrix App - Current Temperature - Clear
   domain: script
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_app_current_temperature_clear.yaml
 
   input:
     device_id:

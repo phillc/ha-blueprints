@@ -1,6 +1,7 @@
 blueprint:
   name: Awtrix Notify
   domain: script
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_notify.yaml
 
   input:
     device_id:
