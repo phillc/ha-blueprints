@@ -1,0 +1,22 @@
+blueprint:
+  name: Awtrix App - Current Temperature - Clear
+  domain: script
+
+  input:
+    device_id:
+      name: Device
+      selector:
+        device:
+          filter:
+            - model: AWTRIX 3
+variables:
+  device_id: !input device_id
+  device_entities: "{{ device_entities(device_id) }}"
+  device_topic: "{{ (device_entities | select('search','device_topic') | list)[0] }}"
+  device_topic_id: "{{ states(device_topic) }}"
+  temperature: "{{ states(sensor_id) }}"
+sequence:
+  - action: mqtt.publish
+    data:
+      topic: "{{ device_topic_id }}/custom/current_temperature"
+      payload: '{"text": "{{ temperature }}°F", "icon": "3357", "pushIcon": 2}'
