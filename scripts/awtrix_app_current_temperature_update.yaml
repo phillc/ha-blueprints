@@ -29,3 +29,4 @@ sequence:
   - action: mqtt.publish
     data:
       topic: "{{ device_topic_id }}/custom/current_temperature"
+      payload: '{"text": "{{ temperature }}°F", "icon": "3357", "pushIcon": 2}'
