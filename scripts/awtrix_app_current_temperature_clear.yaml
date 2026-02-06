@@ -2,20 +2,23 @@ blueprint:
   name: Awtrix App - Current Temperature - Clear
   domain: script
   source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_app_current_temperature_clear.yaml
+  author: phillc
 
-  input:
-    device_id:
-      name: Device
-      selector:
-        device:
-          filter:
-            - model: AWTRIX 3
+fields:
+  awtrix_id:
+    name: Device
+    selector:
+      device:
+        filter:
+          - model: AWTRIX 3
+    required: true
+
 variables:
-  device_id: !input device_id
-  device_entities: "{{ device_entities(device_id) }}"
-  device_topic: "{{ (device_entities | select('search', 'device_topic') | list)[0] }}"
-  device_topic_id: "{{ states(device_topic) }}"
+  awtrix_entities: "{{ device_entities(awtrix_id) }}"
+  awtrix_topic: "{{ awtrix_entities | select('search', 'device_topic') | first }}"
+  awtrix_topic_id: "{{ states(awtrix_topic) }}"
+  
 sequence:
   - action: mqtt.publish
     data:
-      topic: "{{ device_topic_id }}/custom/current_temperature"
+      topic: "{{ awtrix_topic_id }}/custom/current_temperature"

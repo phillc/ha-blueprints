@@ -2,16 +2,16 @@ blueprint:
   name: Awtrix Settings
   domain: script
   source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_settings.yaml
-
-  input:
-    device_id:
-      name: Device
-      selector:
-        device:
-          filter:
-            - model: AWTRIX 3
+  author: phillc
 
 fields:
+  awtrix_id:
+    name: Device
+    selector:
+      device:
+        filter:
+          - model: AWTRIX 3
+    required: true
   TMODE:
     selector:
       select:
@@ -114,11 +114,11 @@ fields:
     required: true
     description: "Enable or disable the weekday display."
     default: unset
+
 variables:
-  device_id: !input device_id
-  device_entities: "{{ device_entities(device_id) }}"
-  device_topic: "{{ (device_entities | select('search', 'device_topic') | list)[0] }}"
-  device_topic_id: "{{ states(device_topic) }}"
+  awtrix_entities: "{{ device_entities(awtrix_id) }}"
+  awtrix_topic: "{{ awtrix_entities | select('search', 'device_topic') | first }}"
+  awtrix_topic_id: "{{ states(awtrix_topic) }}"
   raw_strings:
     TFORMAT: "{{ TFORMAT }}"
     TMODE: "{{ TMODE }}"
@@ -129,10 +129,11 @@ variables:
     TEMP: "{{ TEMP }}"
     BAT: "{{ BAT }}"
     WD: "{{ WD }}"
+
 sequence:
   - action: mqtt.publish
     data:
-      topic: "{{ device_topic_id }}/settings"
+      topic: "{{ awtrix_topic_id }}/settings"
       payload: |-
         {%- set ns = namespace(out={}) %}
         {%- for k, v in raw_strings.items() if v != 'unset' %}
