@@ -1,7 +1,7 @@
 
 blueprint:
   name: Update Awtrix App Calendar
-  domain: script
+  domain: automation
   source_url: https://github.com/phillc/ha-blueprints/blob/main/automations/update_awtrix_app_calendar.yaml
   author: phillc
 
