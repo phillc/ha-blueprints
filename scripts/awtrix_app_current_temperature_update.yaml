@@ -12,8 +12,8 @@ fields:
         filter:
           - model: AWTRIX 3
     required: true
-  sensor_id:
-    name: Sensor
+  temperature_sensor_id:
+    name: Temperature Sensor
     selector:
       entity:
         filter:
@@ -25,7 +25,7 @@ variables:
   awtrix_entities: "{{ device_entities(awtrix_id) }}"
   awtrix_topic: "{{ awtrix_entities | select('search', 'device_topic') | first }}"
   awtrix_topic_id: "{{ states(awtrix_topic) }}"
-  temperature: "{{ states(sensor_id) }}"
+  temperature: "{{ states(temperature_sensor_id) }}"
 
 sequence:
   - action: mqtt.publish
