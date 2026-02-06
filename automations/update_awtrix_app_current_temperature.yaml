@@ -1,0 +1,45 @@
+blueprint:
+  name: Update Awtrix App Current Temperature
+  domain: automation
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/automations/update_awtrix_app_current_temperature.yaml
+  author: phillc
+  
+  input:
+    awtrix_id:
+      name: "Awtrix Device"
+      selector:
+        device:
+          filter:
+            - model: AWTRIX 3
+    awtrix_uptime_id:
+      name: Awtrix's Uptime Sensor
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+    temperature_sensor_id:
+      name: Temperature Sensor
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              device_class: temperature
+
+triggers:
+  - trigger: state
+    entity_id: !input temperature_sensor_id
+  - trigger: numeric_state
+    entity_id: !input awtrix_uptime_id
+    value_template: "{{ state }}"
+    below: 60
+
+variables:
+  awtrix_id: !input awtrix_id
+  temperature_sensor_id: !input temperature_sensor_id
+
+actions:
+  - action: script.awtrix_app_current_temperature_update
+    data:
+      awtrix_id: "{{ awtrix_id }}"
+      temperature_sensor_id: "{{ temperature_sensor_id }}"
+                    

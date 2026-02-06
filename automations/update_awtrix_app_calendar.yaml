@@ -1,0 +1,40 @@
+
+blueprint:
+  name: Update Awtrix App Calendar
+  domain: script
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/automations/update_awtrix_app_calendar.yaml
+  author: phillc
+
+  input:
+    awtrix_id:
+      name: Awtrix Device
+      selector:
+        device:
+          filter:
+            - model: AWTRIX 3
+    awtrix_uptime_id:
+      name: Awtrix's Uptime Sensor
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+    calendar_id:
+      name: Calendar
+      selector:
+        entity:
+          filter:
+            - domain: calendar
+triggers:
+  - trigger: state
+    entity_id: !input calendar_id
+  - trigger: time
+    at: 01:00:00
+  - trigger: numeric_state
+    entity_id: !input awtrix_uptime_id
+    below: 60
+
+actions:
+  - action: script.awtrix_next_calendar_event
+    data:
+      awtrix_id: !input awtrix_id
+      calendar_id: !input calendar_id
