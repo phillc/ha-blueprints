@@ -38,5 +38,5 @@ sequence:
     data:
       topic: "{{ awtrix_topic_id }}/custom/calendar_event"
       payload: >-
-        {% set output = {"text": "{{ prefix }}: {{ text }}", "icon": "230", "pushIcon": 2} %}
+        {% set output = {"text": prefix ~ ": " ~ text, "icon": "230", "pushIcon": 2} %}
         {{ output | to_json(sort_keys=True) }}

@@ -31,4 +31,6 @@ sequence:
   - action: mqtt.publish
     data:
       topic: "{{ awtrix_topic_id }}/custom/current_temperature"
-      payload: '{"text": "{{ temperature }}°F", "icon": "3357", "pushIcon": 2}'
+      payload: >-
+        {% set output = {"text": temperature ~ "°F", "icon": "3357", "pushIcon": 2} %}
+        {{ output | to_json(sort_keys=True) }}
