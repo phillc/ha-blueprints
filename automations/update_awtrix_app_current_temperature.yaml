@@ -24,6 +24,12 @@ blueprint:
           filter:
             - domain: sensor
               device_class: temperature
+    script_id:
+      name: Awtrix App - Current Temperature - Update
+      selector:
+        entity:
+          filter:
+            - domain: script
 
 triggers:
   - trigger: state
@@ -38,7 +44,7 @@ variables:
   temperature_sensor_id: !input temperature_sensor_id
 
 actions:
-  - action: script.awtrix_app_current_temperature_update
+  - action: !input script_id
     data:
       awtrix_id: "{{ awtrix_id }}"
       temperature_sensor_id: "{{ temperature_sensor_id }}"

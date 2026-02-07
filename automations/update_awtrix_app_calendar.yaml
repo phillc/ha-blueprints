@@ -23,6 +23,12 @@ blueprint:
         entity:
           filter:
             - domain: calendar
+    script_id:
+      name: Awtrix App - Calendar Event - Update
+      selector:
+        entity:
+          filter:
+            - domain: script
 triggers:
   - trigger: state
     entity_id: !input calendar_id
@@ -33,7 +39,7 @@ triggers:
     below: 60
 
 actions:
-  - action: script.awtrix_next_calendar_event
+  - action: !input script_id
     data:
       awtrix_id: !input awtrix_id
       calendar_id: !input calendar_id
