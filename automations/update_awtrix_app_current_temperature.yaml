@@ -13,12 +13,15 @@ blueprint:
             - model: AWTRIX 3
     awtrix_uptime_id:
       name: Awtrix's Uptime Sensor
+      description: "Pick the uptime sensor for the Awtrix so that uptime can be used to detect a reboot."
       selector:
         entity:
           filter:
             - domain: sensor
+              device_class: duration
     temperature_sensor_id:
       name: Temperature Sensor
+      description: "Pick the temperature sensor to update the Awtrix App with."
       selector:
         entity:
           filter:
@@ -26,6 +29,7 @@ blueprint:
               device_class: temperature
     script_id:
       name: Awtrix App - Current Temperature - Update
+      description: "Pick the equivalent script that was created with the script blueprint."
       selector:
         entity:
           filter:
