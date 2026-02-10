@@ -40,7 +40,6 @@ triggers:
     entity_id: !input temperature_sensor_id
   - trigger: numeric_state
     entity_id: !input awtrix_uptime_id
-    value_template: "{{ state }}"
     below: 60
 
 variables:
