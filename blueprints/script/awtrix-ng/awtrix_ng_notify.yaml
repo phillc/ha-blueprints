@@ -1,7 +1,7 @@
 blueprint:
   name: AWTRIX NG Notify
   domain: script
-  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_ng_notify.yaml
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/blueprints/script/awtrix-ng/awtrix_ng_notify.yaml
   author: phillc
 
 fields:

@@ -5,7 +5,7 @@ blueprint:
     calendar changes or AWTRIX NG restarts. The automation passes its selected
     AWTRIX NG device and calendar directly to the script.
   domain: automation
-  source_url: https://github.com/phillc/ha-blueprints/blob/main/automations/update_awtrix_ng_app_calendar.yaml
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/blueprints/automation/awtrix-ng/update_awtrix_ng_app_calendar.yaml
   author: phillc
 
   input:

@@ -5,7 +5,7 @@ blueprint:
     temperature changes or AWTRIX NG restarts. The automation passes its selected
     AWTRIX NG device and temperature sensor directly to the script.
   domain: automation
-  source_url: https://github.com/phillc/ha-blueprints/blob/main/automations/update_awtrix_ng_app_current_temperature.yaml
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/blueprints/automation/awtrix-ng/update_awtrix_ng_app_current_temperature.yaml
   author: phillc
   
   input:

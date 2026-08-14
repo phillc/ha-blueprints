@@ -1,7 +1,7 @@
 blueprint:
   name: AWTRIX NG App - Current Temperature - Clear
   domain: script
-  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_ng_app_current_temperature_clear.yaml
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/blueprints/script/awtrix-ng/awtrix_ng_app_current_temperature_clear.yaml
   author: phillc
 
 fields:
