@@ -1,19 +1,23 @@
 blueprint:
   name: Update AWTRIX NG App Calendar
+  description: >-
+    Calls the selected AWTRIX NG Calendar Event Update script whenever the
+    calendar changes or AWTRIX NG restarts. The automation passes its selected
+    AWTRIX NG device and calendar directly to the script.
   domain: automation
   source_url: https://github.com/phillc/ha-blueprints/blob/main/automations/update_awtrix_ng_app_calendar.yaml
   author: phillc
 
   input:
     awtrix_id:
-      name: Awtrix Device
+      name: AWTRIX NG Device
       selector:
         device:
           filter:
             - model: AWTRIX NG
     awtrix_uptime_id:
-      name: Awtrix's Uptime Sensor
-      description: "Pick the uptime sensor for the Awtrix so that uptime can be used to detect a reboot."
+      name: AWTRIX NG Uptime Sensor
+      description: "Select the uptime sensor belonging to the AWTRIX NG device above. A value below 60 republishes the app after a reboot."
       selector:
         entity:
           filter:
@@ -21,14 +25,14 @@ blueprint:
               device_class: duration
     calendar_id:
       name: Calendar
-      description: "Pick the calendar to update the Awtrix App with."
+      description: "Select the calendar whose next event is sent to AWTRIX NG."
       selector:
         entity:
           filter:
             - domain: calendar
     script_id:
-      name: Awtrix App - Calendar Event - Update
-      description: "Pick the equivalent script that was created with the script blueprint."
+      name: AWTRIX NG Calendar Update Script
+      description: "Select a script created from the AWTRIX NG App - Calendar Event - Update blueprint. This automation supplies its selected device and calendar to that script."
       selector:
         entity:
           filter:
@@ -42,8 +46,12 @@ triggers:
     entity_id: !input awtrix_uptime_id
     below: 60
 
+variables:
+  awtrix_id: !input awtrix_id
+  calendar_id: !input calendar_id
+
 actions:
   - action: !input script_id
     data:
-      awtrix_id: !input awtrix_id
-      calendar_id: !input calendar_id
+      awtrix_id: "{{ awtrix_id }}"
+      calendar_id: "{{ calendar_id }}"

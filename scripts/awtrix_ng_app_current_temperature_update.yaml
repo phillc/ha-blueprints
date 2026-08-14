@@ -1,19 +1,23 @@
 blueprint:
   name: AWTRIX NG App - Current Temperature - Update
+  description: >-
+    Publishes the selected temperature sensor as an AWTRIX NG pushed app.
+    Run it manually with a device and sensor, or call it from the matching
+    automation blueprint.
   domain: script
   source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_ng_app_current_temperature_update.yaml
   author: phillc
 
 fields:
   awtrix_id:
-    name: Device
+    name: AWTRIX NG Device
     selector:
       device:
         filter:
           - model: AWTRIX NG
     required: true
   temperature_sensor_id:
-    name: Temperature Sensor
+    name: Temperature Sensor Source
     selector:
       entity:
         filter:

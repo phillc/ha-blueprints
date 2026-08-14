@@ -1,19 +1,23 @@
 blueprint:
   name: AWTRIX NG App - Calendar Event - Update
+  description: >-
+    Publishes the selected calendar's next event as an AWTRIX NG pushed app.
+    Run it manually with a device and calendar, or call it from the matching
+    automation blueprint.
   domain: script
   source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_ng_app_calendar_event_update.yaml
   author: phillc
   
 fields:
   awtrix_id:
-    name: Device
+    name: AWTRIX NG Device
     selector:
       device:
         filter:
           - model: AWTRIX NG
     required: true
   calendar_id:
-    name: Calendar
+    name: Calendar Source
     selector:
       entity:
         filter:
