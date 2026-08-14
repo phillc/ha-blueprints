@@ -1,7 +1,7 @@
 blueprint:
-  name: Awtrix Reboot
+  name: AWTRIX NG Reboot
   domain: script
-  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_reboot.yaml
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_ng_reboot.yaml
   author: phillc
 
 fields:
@@ -10,15 +10,15 @@ fields:
     selector:
       device:
         filter:
-          - model: AWTRIX 3
+          - model: AWTRIX NG
     required: true
 
 variables:
   awtrix_entities: "{{ device_entities(awtrix_id) }}"
-  awtrix_topic: "{{ awtrix_entities | select('search', 'device_topic') | first }}"
+  awtrix_topic: "{{ awtrix_entities | select('search', 'mqtt_prefix') | first }}"
   awtrix_topic_id: "{{ states(awtrix_topic) }}"
 
 sequence:
   - action: mqtt.publish
     data:
-      topic: "{{ awtrix_topic_id }}/reboot"
+      topic: "{{ awtrix_topic_id }}/cmd/device/reboot"

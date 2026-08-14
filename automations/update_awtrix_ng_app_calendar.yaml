@@ -1,16 +1,16 @@
 blueprint:
-  name: Update Awtrix App Current Temperature
+  name: Update AWTRIX NG App Calendar
   domain: automation
-  source_url: https://github.com/phillc/ha-blueprints/blob/main/automations/update_awtrix_app_current_temperature.yaml
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/automations/update_awtrix_ng_app_calendar.yaml
   author: phillc
-  
+
   input:
     awtrix_id:
-      name: "Awtrix Device"
+      name: Awtrix Device
       selector:
         device:
           filter:
-            - model: AWTRIX 3
+            - model: AWTRIX NG
     awtrix_uptime_id:
       name: Awtrix's Uptime Sensor
       description: "Pick the uptime sensor for the Awtrix so that uptime can be used to detect a reboot."
@@ -19,36 +19,31 @@ blueprint:
           filter:
             - domain: sensor
               device_class: duration
-    temperature_sensor_id:
-      name: Temperature Sensor
-      description: "Pick the temperature sensor to update the Awtrix App with."
+    calendar_id:
+      name: Calendar
+      description: "Pick the calendar to update the Awtrix App with."
       selector:
         entity:
           filter:
-            - domain: sensor
-              device_class: temperature
+            - domain: calendar
     script_id:
-      name: Awtrix App - Current Temperature - Update
+      name: Awtrix App - Calendar Event - Update
       description: "Pick the equivalent script that was created with the script blueprint."
       selector:
         entity:
           filter:
             - domain: script
-
 triggers:
   - trigger: state
-    entity_id: !input temperature_sensor_id
+    entity_id: !input calendar_id
+  - trigger: time
+    at: 01:00:00
   - trigger: numeric_state
     entity_id: !input awtrix_uptime_id
     below: 60
 
-variables:
-  awtrix_id: !input awtrix_id
-  temperature_sensor_id: !input temperature_sensor_id
-
 actions:
   - action: !input script_id
     data:
-      awtrix_id: "{{ awtrix_id }}"
-      temperature_sensor_id: "{{ temperature_sensor_id }}"
-                    
+      awtrix_id: !input awtrix_id
+      calendar_id: !input calendar_id

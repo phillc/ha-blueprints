@@ -1,7 +1,7 @@
 blueprint:
-  name: Awtrix Notify
+  name: AWTRIX NG Notify
   domain: script
-  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_notify.yaml
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_ng_notify.yaml
   author: phillc
 
 fields:
@@ -10,7 +10,7 @@ fields:
     selector:
       device:
         filter:
-          - model: AWTRIX 3
+          - model: AWTRIX NG
     required: true
   text:
     selector:
@@ -20,13 +20,13 @@ fields:
 
 variables:
   awtrix_entities: "{{ device_entities(awtrix_id) }}"
-  awtrix_topic: "{{ awtrix_entities | select('search', 'device_topic') | first }}"
+  awtrix_topic: "{{ awtrix_entities | select('search', 'mqtt_prefix') | first }}"
   awtrix_topic_id: "{{ states(awtrix_topic) }}"
 
 sequence:
   - action: mqtt.publish
     data:
-      topic: "{{ awtrix_topic_id }}/notify"
+      topic: "{{ awtrix_topic_id }}/cmd/notify"
       payload: >-
         {% set output = {"text": text} %}
         {{ output | to_json(sort_keys=True) }}

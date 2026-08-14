@@ -1,7 +1,7 @@
 blueprint:
-  name: Awtrix Settings
+  name: AWTRIX NG Settings
   domain: script
-  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_settings.yaml
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_ng_settings.yaml
   author: phillc
 
 fields:
@@ -10,7 +10,7 @@ fields:
     selector:
       device:
         filter:
-          - model: AWTRIX 3
+          - model: AWTRIX NG
     required: true
   TMODE:
     selector:
@@ -100,7 +100,7 @@ fields:
           - "true"
           - "false"
     required: true
-    description: "Enable or disable the native battery app (requires reboot)."
+    description: "Enable or disable the native battery app in the app loop."
     default: unset
   WD:
     selector:
@@ -117,29 +117,55 @@ fields:
 
 variables:
   awtrix_entities: "{{ device_entities(awtrix_id) }}"
-  awtrix_topic: "{{ awtrix_entities | select('search', 'device_topic') | first }}"
+  awtrix_topic: "{{ awtrix_entities | select('search', 'mqtt_prefix') | first }}"
   awtrix_topic_id: "{{ states(awtrix_topic) }}"
   raw_strings:
-    TFORMAT: "{{ TFORMAT }}"
-    TMODE: "{{ TMODE }}"
-  raw_trinary:
-    TIM: "{{ TIM }}"
-    DAT: "{{ DAT }}"
-    HUM: "{{ HUM }}"
-    TEMP: "{{ TEMP }}"
-    BAT: "{{ BAT }}"
-    WD: "{{ WD }}"
+    timeMode: "{{ TMODE }}"
+  raw_apps:
+    Time: "{{ TIM }}"
+    Date: "{{ DAT }}"
+    Humidity: "{{ HUM }}"
+    Temperature: "{{ TEMP }}"
+    Battery: "{{ BAT }}"
 
 sequence:
   - action: mqtt.publish
     data:
-      topic: "{{ awtrix_topic_id }}/settings"
+      topic: "{{ awtrix_topic_id }}/cmd/settings"
       payload: |-
         {%- set ns = namespace(out={}) %}
         {%- for k, v in raw_strings.items() if v != 'unset' %}
           {% set ns.out = combine(ns.out, { k: v }) %}
         {%- endfor %}
-        {%- for k, v in raw_trinary.items() if v != 'unset' %}
-          {%- set ns.out = combine(ns.out, { k: (v == 'true') }) %}
-        {%- endfor %}
+        {%- if WD != 'unset' %}
+          {% set ns.out = combine(ns.out, {'weekdayBar': {'show': WD == 'true'}}) %}
+        {%- endif %}
+        {%- if TFORMAT != 'unset' %}
+          {%- set formats = {
+            '%H:%M:%S': {'time24h': true, 'timeShowSeconds': true, 'timeShowAmPm': false},
+            '%l:%M:%S': {'time24h': false, 'timeShowSeconds': true, 'timeShowAmPm': false},
+            '%H:%M': {'time24h': true, 'timeShowSeconds': false, 'timeShowAmPm': false},
+            '%H %M': {'time24h': true, 'timeShowSeconds': false, 'timeShowAmPm': false},
+            '%l:%M': {'time24h': false, 'timeShowSeconds': false, 'timeShowAmPm': false},
+            '%l %M': {'time24h': false, 'timeShowSeconds': false, 'timeShowAmPm': false},
+            '%l:%M %p': {'time24h': false, 'timeShowSeconds': false, 'timeShowAmPm': true},
+            '%l %M %p': {'time24h': false, 'timeShowSeconds': false, 'timeShowAmPm': true}
+          } %}
+          {% set ns.out = combine(ns.out, formats[TFORMAT]) %}
+        {%- endif %}
         {{ ns.out | tojson }}
+  - if: "{{ raw_apps.values() | reject('eq', 'unset') | list | count > 0 }}"
+    then:
+      - action: mqtt.publish
+        data:
+          topic: "{{ awtrix_topic_id }}/cmd/apps/order"
+          payload: |-
+            {%- set ns = namespace(order=[], disabled=[]) %}
+            {%- for name, enabled in raw_apps.items() if enabled != 'unset' %}
+              {%- if enabled == 'true' %}
+                {% set ns.order = ns.order + [name] %}
+              {%- else %}
+                {% set ns.disabled = ns.disabled + [name] %}
+              {%- endif %}
+            {%- endfor %}
+            {{ {'order': ns.order, 'disabled': ns.disabled} | tojson }}

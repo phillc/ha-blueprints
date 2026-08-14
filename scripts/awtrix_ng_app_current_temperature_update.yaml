@@ -1,7 +1,7 @@
 blueprint:
-  name: Awtrix App - Current Temperature - Update
+  name: AWTRIX NG App - Current Temperature - Update
   domain: script
-  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_app_current_temperature_update.yaml
+  source_url: https://github.com/phillc/ha-blueprints/blob/main/scripts/awtrix_ng_app_current_temperature_update.yaml
   author: phillc
 
 fields:
@@ -10,7 +10,7 @@ fields:
     selector:
       device:
         filter:
-          - model: AWTRIX 3
+          - model: AWTRIX NG
     required: true
   temperature_sensor_id:
     name: Temperature Sensor
@@ -23,14 +23,14 @@ fields:
 
 variables:
   awtrix_entities: "{{ device_entities(awtrix_id) }}"
-  awtrix_topic: "{{ awtrix_entities | select('search', 'device_topic') | first }}"
+  awtrix_topic: "{{ awtrix_entities | select('search', 'mqtt_prefix') | first }}"
   awtrix_topic_id: "{{ states(awtrix_topic) }}"
   temperature: "{{ states(temperature_sensor_id) }}"
 
 sequence:
   - action: mqtt.publish
     data:
-      topic: "{{ awtrix_topic_id }}/custom/current_temperature"
+      topic: "{{ awtrix_topic_id }}/cmd/apps/pushed/current_temperature"
       payload: >-
-        {% set output = {"text": temperature ~ "°F", "icon": "3357", "pushIcon": 2} %}
+        {% set output = {"text": temperature ~ "°F", "icon": "3357", "iconMode": "push"} %}
         {{ output | to_json(sort_keys=True) }}
