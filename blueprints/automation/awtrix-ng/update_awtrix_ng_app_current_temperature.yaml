@@ -2,8 +2,8 @@ blueprint:
   name: Update AWTRIX NG App Current Temperature
   description: >-
     Calls the selected AWTRIX NG Current Temperature Update script whenever the
-    temperature changes or AWTRIX NG restarts. The automation passes its selected
-    AWTRIX NG device and temperature sensor directly to the script.
+    temperature changes or AWTRIX NG restarts. The script is configured for the
+    selected AWTRIX NG device; this automation supplies the temperature sensor.
   domain: automation
   source_url: https://github.com/phillc/ha-blueprints/blob/main/blueprints/automation/awtrix-ng/update_awtrix_ng_app_current_temperature.yaml
   author: phillc
@@ -33,7 +33,7 @@ blueprint:
               device_class: temperature
     script_id:
       name: AWTRIX NG Current Temperature Update Script
-      description: "Select a script created from the AWTRIX NG App - Current Temperature - Update blueprint. This automation supplies its selected device and sensor to that script."
+      description: "Select a script created from the AWTRIX NG App - Current Temperature - Update blueprint. Its device should match the AWTRIX NG device selected above."
       selector:
         entity:
           filter:
@@ -46,12 +46,7 @@ triggers:
     entity_id: !input awtrix_uptime_id
     below: 60
 
-variables:
-  awtrix_id: !input awtrix_id
-  temperature_sensor_id: !input temperature_sensor_id
-
 actions:
   - action: !input script_id
     data:
-      awtrix_id: "{{ awtrix_id }}"
-      temperature_sensor_id: "{{ temperature_sensor_id }}"
+      temperature_sensor_id: !input temperature_sensor_id
