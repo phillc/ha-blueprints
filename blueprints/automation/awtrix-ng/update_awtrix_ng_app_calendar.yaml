@@ -33,8 +33,9 @@ blueprint:
         entity:
           filter:
             - domain: script
-  trigger_variables:
-    awtrix_id: !input awtrix_id
+trigger_variables:
+  awtrix_id: !input awtrix_id
+
 triggers:
   - trigger: state
     entity_id: !input calendar_id
