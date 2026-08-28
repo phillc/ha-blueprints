@@ -9,14 +9,12 @@ blueprint:
   author: phillc
   
   input:
-    awtrix_id:
-      name: AWTRIX NG Device
-      description: "Select the AWTRIX NG device. Its duration-class sensor is used to detect reboots."
+    awtrix_uptime_id:
+      name: AWTRIX NG Uptime Sensor
+      description: "Select the uptime sensor belonging to the device configured in the selected script. A value below 60 republishes the app after a reboot."
       selector:
-        device:
+        entity:
           filter:
-            - model: AWTRIX NG
-          entity:
             - domain: sensor
               device_class: duration
     temperature_sensor_id:
@@ -29,23 +27,17 @@ blueprint:
               device_class: temperature
     script_id:
       name: AWTRIX NG Current Temperature Update Script
-      description: "Select a script created from the AWTRIX NG App - Current Temperature - Update blueprint. Its device should match the selected AWTRIX NG device."
+      description: "Select a script created from the AWTRIX NG App - Current Temperature - Update blueprint. Its device should match the selected uptime sensor."
       selector:
         entity:
           filter:
             - domain: script
-trigger_variables:
-  awtrix_id: !input awtrix_id
-
 triggers:
   - trigger: state
     entity_id: !input temperature_sensor_id
-  - trigger: template
-    value_template: >-
-      {% set uptime = expand(device_entities(awtrix_id))
-        | selectattr('attributes.device_class', 'eq', 'duration')
-        | map(attribute='entity_id') | list | first %}
-      {{ uptime is not none and states(uptime) | float(999) < 60 }}
+  - trigger: numeric_state
+    entity_id: !input awtrix_uptime_id
+    below: 60
 
 actions:
   - action: !input script_id
