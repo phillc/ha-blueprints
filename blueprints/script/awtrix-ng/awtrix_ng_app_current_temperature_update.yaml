@@ -1,9 +1,9 @@
 blueprint:
   name: AWTRIX NG App - Current Temperature - Update
   description: >-
-    Publishes the selected temperature sensor as an AWTRIX NG pushed app.
-    Configure it for one AWTRIX NG device, then run it manually with a sensor
-    or call it from the matching automation blueprint.
+    Publishes one to five selected temperature sensors as an AWTRIX NG pushed
+    app. Each sensor can be independently rounded and formatted with a degree
+    symbol, unit, and text color.
   domain: script
   source_url: https://github.com/phillc/ha-blueprints/blob/main/blueprints/script/awtrix-ng/awtrix_ng_app_current_temperature_update.yaml
   author: phillc
@@ -14,28 +14,193 @@ blueprint:
         device:
           filter:
             - model: AWTRIX NG
-
-fields:
-  temperature_sensor_id:
-    name: Temperature Sensor Source
-    selector:
-      entity:
-        filter:
-          - domain: sensor
-            device_class: temperature
-    required: true
+    app_name:
+      name: App Name
+      description: "The pushed app name used in the AWTRIX NG app rotation."
+      default: current_temperature
+      selector:
+        text:
+          type: text
+    app_icon:
+      name: App Icon
+      description: "Optional AWTRIX icon ID for the app."
+      default: "3357"
+      selector:
+        text:
+          type: text
+    temperature_sensor_id:
+      name: Temperature Sensors
+      description: "Select one to five temperature sensors."
+      selector:
+        entity:
+          multiple: true
+          filter:
+            - domain: sensor
+              device_class: temperature
+    temperature_1_round:
+      name: Sensor 1 - Round
+      default: false
+      selector:
+        boolean:
+    temperature_1_degree:
+      name: Sensor 1 - Degree Symbol
+      default: true
+      selector:
+        boolean:
+    temperature_1_unit:
+      name: Sensor 1 - Unit
+      default: F
+      selector:
+        text:
+          type: text
+    temperature_1_color:
+      name: Sensor 1 - Text Color
+      default: [255, 255, 255]
+      selector:
+        color_rgb: {}
+    temperature_2_round:
+      name: Sensor 2 - Round
+      default: false
+      selector:
+        boolean:
+    temperature_2_degree:
+      name: Sensor 2 - Degree Symbol
+      default: true
+      selector:
+        boolean:
+    temperature_2_unit:
+      name: Sensor 2 - Unit
+      default: F
+      selector:
+        text:
+          type: text
+    temperature_2_color:
+      name: Sensor 2 - Text Color
+      default: [255, 255, 255]
+      selector:
+        color_rgb: {}
+    temperature_3_round:
+      name: Sensor 3 - Round
+      default: false
+      selector:
+        boolean:
+    temperature_3_degree:
+      name: Sensor 3 - Degree Symbol
+      default: true
+      selector:
+        boolean:
+    temperature_3_unit:
+      name: Sensor 3 - Unit
+      default: F
+      selector:
+        text:
+          type: text
+    temperature_3_color:
+      name: Sensor 3 - Text Color
+      default: [255, 255, 255]
+      selector:
+        color_rgb: {}
+    temperature_4_round:
+      name: Sensor 4 - Round
+      default: false
+      selector:
+        boolean:
+    temperature_4_degree:
+      name: Sensor 4 - Degree Symbol
+      default: true
+      selector:
+        boolean:
+    temperature_4_unit:
+      name: Sensor 4 - Unit
+      default: F
+      selector:
+        text:
+          type: text
+    temperature_4_color:
+      name: Sensor 4 - Text Color
+      default: [255, 255, 255]
+      selector:
+        color_rgb: {}
+    temperature_5_round:
+      name: Sensor 5 - Round
+      default: false
+      selector:
+        boolean:
+    temperature_5_degree:
+      name: Sensor 5 - Degree Symbol
+      default: true
+      selector:
+        boolean:
+    temperature_5_unit:
+      name: Sensor 5 - Unit
+      default: F
+      selector:
+        text:
+          type: text
+    temperature_5_color:
+      name: Sensor 5 - Text Color
+      default: [255, 255, 255]
+      selector:
+        color_rgb: {}
 
 variables:
   awtrix_id: !input awtrix_id
+  app_name: !input app_name
+  app_icon: !input app_icon
+  temperature_sensor_id: !input temperature_sensor_id
+  temperature_1_round: !input temperature_1_round
+  temperature_1_degree: !input temperature_1_degree
+  temperature_1_unit: !input temperature_1_unit
+  temperature_1_color: !input temperature_1_color
+  temperature_2_round: !input temperature_2_round
+  temperature_2_degree: !input temperature_2_degree
+  temperature_2_unit: !input temperature_2_unit
+  temperature_2_color: !input temperature_2_color
+  temperature_3_round: !input temperature_3_round
+  temperature_3_degree: !input temperature_3_degree
+  temperature_3_unit: !input temperature_3_unit
+  temperature_3_color: !input temperature_3_color
+  temperature_4_round: !input temperature_4_round
+  temperature_4_degree: !input temperature_4_degree
+  temperature_4_unit: !input temperature_4_unit
+  temperature_4_color: !input temperature_4_color
+  temperature_5_round: !input temperature_5_round
+  temperature_5_degree: !input temperature_5_degree
+  temperature_5_unit: !input temperature_5_unit
+  temperature_5_color: !input temperature_5_color
   awtrix_entities: "{{ device_entities(awtrix_id) }}"
   awtrix_topic: "{{ awtrix_entities | select('search', 'mqtt_prefix') | first }}"
   awtrix_topic_id: "{{ states(awtrix_topic) }}"
-  temperature: "{{ states(temperature_sensor_id) }}"
 
 sequence:
   - action: mqtt.publish
     data:
-      topic: "{{ awtrix_topic_id }}/cmd/apps/pushed/current_temperature"
+      topic: "{{ awtrix_topic_id }}/cmd/apps/pushed/{{ app_name }}"
       payload: >-
-        {% set output = {"text": temperature ~ "°F", "icon": "3357", "iconMode": "push"} %}
+        {% set sensor_ids = temperature_sensor_id if temperature_sensor_id is iterable and temperature_sensor_id is not string else [temperature_sensor_id] %}
+        {% set sensor_ids = sensor_ids[:5] %}
+        {% set round_flags = [temperature_1_round, temperature_2_round, temperature_3_round, temperature_4_round, temperature_5_round] %}
+        {% set degree_flags = [temperature_1_degree, temperature_2_degree, temperature_3_degree, temperature_4_degree, temperature_5_degree] %}
+        {% set units = [temperature_1_unit, temperature_2_unit, temperature_3_unit, temperature_4_unit, temperature_5_unit] %}
+        {% set colors = [temperature_1_color, temperature_2_color, temperature_3_color, temperature_4_color, temperature_5_color] %}
+        {% set ns = namespace(fragments=[]) %}
+        {% for sensor_id in sensor_ids %}
+          {% set value = states(sensor_id) %}
+          {% if value not in ['unknown', 'unavailable', 'none'] %}
+            {% if round_flags[loop.index0] %}
+              {% set value = value | float | round(0) | int | string %}
+            {% endif %}
+            {% set value = value ~ ("°" if degree_flags[loop.index0] else "") ~ (units[loop.index0] if units[loop.index0] else "") %}
+            {% set fragment = {"text": value, "color": colors[loop.index0]} %}
+            {% set ns.fragments = ns.fragments + [fragment] %}
+            {% if not loop.last and sensor_ids | count > 1 %}
+              {% set ns.fragments = ns.fragments + [{"text": " "}] %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+        {% if app_icon %}
+          {% set output = {"text": ns.fragments, "icon": app_icon, "iconMode": "push"} %}
+        {% else %}
+          {% set output = {"text": ns.fragments} %}
+        {% endif %}
         {{ output | to_json(sort_keys=True) }}

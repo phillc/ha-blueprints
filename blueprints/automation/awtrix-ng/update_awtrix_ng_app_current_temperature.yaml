@@ -1,13 +1,13 @@
 blueprint:
   name: Update AWTRIX NG App Current Temperature
   description: >-
-    Calls the selected AWTRIX NG Current Temperature Update script whenever the
-    temperature changes or AWTRIX NG restarts. The script is configured for the
-    selected AWTRIX NG device; this automation supplies the temperature sensor.
+    Calls the selected AWTRIX NG Current Temperature Update script at the
+    configured interval and whenever AWTRIX NG restarts. The selected script
+    contains all sensor and display configuration.
   domain: automation
   source_url: https://github.com/phillc/ha-blueprints/blob/main/blueprints/automation/awtrix-ng/update_awtrix_ng_app_current_temperature.yaml
   author: phillc
-  
+
   input:
     awtrix_uptime_id:
       name: AWTRIX NG Uptime Sensor
@@ -17,29 +17,34 @@ blueprint:
           filter:
             - domain: sensor
               device_class: duration
-    temperature_sensor_id:
-      name: Temperature Sensor
-      description: "Select the temperature sensor sent to AWTRIX NG."
-      selector:
-        entity:
-          filter:
-            - domain: sensor
-              device_class: temperature
     script_id:
       name: AWTRIX NG Current Temperature Update Script
-      description: "Select a script created from the AWTRIX NG App - Current Temperature - Update blueprint. Its device should match the selected uptime sensor."
+      description: "Select a script created from the AWTRIX NG App - Current Temperature - Update blueprint."
       selector:
         entity:
           filter:
             - domain: script
+    refresh_interval:
+      name: Refresh Interval
+      description: "How often to republish the temperature app."
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 60
+          step: 1
+          mode: box
+          unit_of_measurement: minutes
+
+trigger_variables:
+  refresh_interval: !input refresh_interval
+
 triggers:
-  - trigger: state
-    entity_id: !input temperature_sensor_id
+  - trigger: time_pattern
+    minutes: "/{{ refresh_interval | int }}"
   - trigger: numeric_state
     entity_id: !input awtrix_uptime_id
     below: 60
 
 actions:
   - action: !input script_id
-    data:
-      temperature_sensor_id: !input temperature_sensor_id
