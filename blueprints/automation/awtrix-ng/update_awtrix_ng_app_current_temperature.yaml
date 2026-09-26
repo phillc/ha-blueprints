@@ -43,8 +43,15 @@ triggers:
   - trigger: time_pattern
     minutes: "/{{ refresh_interval | int }}"
   - trigger: numeric_state
+    id: uptime
     entity_id: !input awtrix_uptime_id
     below: 60
 
 actions:
+  - if:
+      - condition: trigger
+        id: uptime
+    then:
+      - delay:
+          seconds: 10
   - action: !input script_id
