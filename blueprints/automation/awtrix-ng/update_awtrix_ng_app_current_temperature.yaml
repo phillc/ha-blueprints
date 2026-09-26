@@ -27,21 +27,27 @@ blueprint:
     refresh_interval:
       name: Refresh Interval
       description: "How often to republish the temperature app."
-      default: 5
+      default: "/5"
       selector:
-        number:
-          min: 1
-          max: 60
-          step: 1
-          mode: box
-          unit_of_measurement: minutes
-
-trigger_variables:
-  refresh_interval: !input refresh_interval
+        select:
+          mode: dropdown
+          options:
+            - label: Every minute
+              value: "/1"
+            - label: Every 5 minutes
+              value: "/5"
+            - label: Every 10 minutes
+              value: "/10"
+            - label: Every 15 minutes
+              value: "/15"
+            - label: Every 30 minutes
+              value: "/30"
+            - label: Every hour
+              value: "0"
 
 triggers:
   - trigger: time_pattern
-    minutes: "/{{ refresh_interval | int }}"
+    minutes: !input refresh_interval
   - trigger: numeric_state
     id: uptime
     entity_id: !input awtrix_uptime_id

@@ -28,12 +28,10 @@ blueprint:
       selector:
         text:
           type: text
-    temperature_sensor_id:
-      name: Temperature Sensors
-      description: "Select one to five temperature sensors."
+    temperature_1_sensor_id:
+      name: Sensor 1 - Temperature Sensor
       selector:
         entity:
-          multiple: true
           filter:
             - domain: sensor
               device_class: temperature
@@ -58,6 +56,15 @@ blueprint:
       default: [255, 255, 255]
       selector:
         color_rgb: {}
+    temperature_2_sensor_id:
+      name: Sensor 2 - Temperature Sensor
+      description: "Optional. Leave empty to skip this slot."
+      default: ""
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              device_class: temperature
     temperature_2_round:
       name: Sensor 2 - Round
       default: false
@@ -79,6 +86,15 @@ blueprint:
       default: [255, 255, 255]
       selector:
         color_rgb: {}
+    temperature_3_sensor_id:
+      name: Sensor 3 - Temperature Sensor
+      description: "Optional. Leave empty to skip this slot."
+      default: ""
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              device_class: temperature
     temperature_3_round:
       name: Sensor 3 - Round
       default: false
@@ -100,6 +116,15 @@ blueprint:
       default: [255, 255, 255]
       selector:
         color_rgb: {}
+    temperature_4_sensor_id:
+      name: Sensor 4 - Temperature Sensor
+      description: "Optional. Leave empty to skip this slot."
+      default: ""
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              device_class: temperature
     temperature_4_round:
       name: Sensor 4 - Round
       default: false
@@ -121,6 +146,15 @@ blueprint:
       default: [255, 255, 255]
       selector:
         color_rgb: {}
+    temperature_5_sensor_id:
+      name: Sensor 5 - Temperature Sensor
+      description: "Optional. Leave empty to skip this slot."
+      default: ""
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              device_class: temperature
     temperature_5_round:
       name: Sensor 5 - Round
       default: false
@@ -147,23 +181,27 @@ variables:
   awtrix_id: !input awtrix_id
   app_name: !input app_name
   app_icon: !input app_icon
-  temperature_sensor_id: !input temperature_sensor_id
+  temperature_1_sensor_id: !input temperature_1_sensor_id
   temperature_1_round: !input temperature_1_round
   temperature_1_degree: !input temperature_1_degree
   temperature_1_unit: !input temperature_1_unit
   temperature_1_color: !input temperature_1_color
+  temperature_2_sensor_id: !input temperature_2_sensor_id
   temperature_2_round: !input temperature_2_round
   temperature_2_degree: !input temperature_2_degree
   temperature_2_unit: !input temperature_2_unit
   temperature_2_color: !input temperature_2_color
+  temperature_3_sensor_id: !input temperature_3_sensor_id
   temperature_3_round: !input temperature_3_round
   temperature_3_degree: !input temperature_3_degree
   temperature_3_unit: !input temperature_3_unit
   temperature_3_color: !input temperature_3_color
+  temperature_4_sensor_id: !input temperature_4_sensor_id
   temperature_4_round: !input temperature_4_round
   temperature_4_degree: !input temperature_4_degree
   temperature_4_unit: !input temperature_4_unit
   temperature_4_color: !input temperature_4_color
+  temperature_5_sensor_id: !input temperature_5_sensor_id
   temperature_5_round: !input temperature_5_round
   temperature_5_degree: !input temperature_5_degree
   temperature_5_unit: !input temperature_5_unit
@@ -177,25 +215,24 @@ sequence:
     data:
       topic: "{{ awtrix_topic_id }}/cmd/apps/pushed/{{ app_name }}"
       payload: >-
-        {% set sensor_ids = temperature_sensor_id if temperature_sensor_id is iterable and temperature_sensor_id is not string else [temperature_sensor_id] %}
-        {% set sensor_ids = sensor_ids[:5] %}
+        {% set sensor_ids = [temperature_1_sensor_id, temperature_2_sensor_id, temperature_3_sensor_id, temperature_4_sensor_id, temperature_5_sensor_id] %}
         {% set round_flags = [temperature_1_round, temperature_2_round, temperature_3_round, temperature_4_round, temperature_5_round] %}
         {% set degree_flags = [temperature_1_degree, temperature_2_degree, temperature_3_degree, temperature_4_degree, temperature_5_degree] %}
         {% set units = [temperature_1_unit, temperature_2_unit, temperature_3_unit, temperature_4_unit, temperature_5_unit] %}
         {% set colors = [temperature_1_color, temperature_2_color, temperature_3_color, temperature_4_color, temperature_5_color] %}
         {% set ns = namespace(fragments=[]) %}
         {% for sensor_id in sensor_ids %}
-          {% set value = states(sensor_id) %}
+          {% set value = states(sensor_id) if sensor_id else "unknown" %}
           {% if value not in ['unknown', 'unavailable', 'none'] %}
             {% if round_flags[loop.index0] %}
               {% set value = value | float | round(0) | int | string %}
             {% endif %}
             {% set value = value ~ ("°" if degree_flags[loop.index0] else "") ~ (units[loop.index0] if units[loop.index0] else "") %}
             {% set fragment = {"text": value, "color": colors[loop.index0]} %}
-            {% set ns.fragments = ns.fragments + [fragment] %}
-            {% if not loop.last and sensor_ids | count > 1 %}
+            {% if ns.fragments %}
               {% set ns.fragments = ns.fragments + [{"text": " "}] %}
             {% endif %}
+            {% set ns.fragments = ns.fragments + [fragment] %}
           {% endif %}
         {% endfor %}
         {% if app_icon %}
