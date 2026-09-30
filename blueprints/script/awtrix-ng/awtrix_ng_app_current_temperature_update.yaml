@@ -35,6 +35,8 @@ blueprint:
         Add an entry for each temperature to display, in display order.
         Labels appear before readings (Inside becomes Inside: 72°F) and use
         the entry's text color. Leave the label empty for no label.
+        Omitted settings use no rounding, a degree symbol, the sensor's unit,
+        and white text.
       default: []
       selector:
         object:
@@ -52,13 +54,11 @@ blueprint:
                       device_class: temperature
             label:
               label: Label
-              default: ""
               selector:
                 text:
                   type: text
             rounding:
               label: Rounding
-              default: "No rounding"
               selector:
                 select:
                   mode: dropdown
@@ -69,17 +69,14 @@ blueprint:
                     - "2"
             degree:
               label: Degree Symbol
-              default: true
               selector:
                 boolean: {}
             show_unit:
               label: Show Unit (C or F)
-              default: true
               selector:
                 boolean: {}
             color:
               label: Text Color
-              default: [255, 255, 255]
               selector:
                 color_rgb: {}
 
