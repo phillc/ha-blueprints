@@ -35,8 +35,8 @@ blueprint:
         Add an entry for each temperature to display, in display order.
         Labels appear directly before readings (Inside becomes Inside72.1) and use
         the entry's text color. Leave the label empty for no label.
-        Readings default to one decimal place. Turn on Degree Symbol and
-        Show Unit to include them. An omitted color uses white; select white
+        Readings default to one decimal place with a degree symbol and unit.
+        Select Hide to omit either. An omitted color uses white; select white
         explicitly if the color picker shows black.
       default: []
       selector:
@@ -71,12 +71,26 @@ blueprint:
                     - "2"
             degree:
               label: Degree Symbol
+              required: true
               selector:
-                boolean: {}
+                select:
+                  mode: dropdown
+                  options:
+                    - label: Show
+                      value: "true"
+                    - label: Hide
+                      value: "false"
             show_unit:
               label: Show Unit (C or F)
+              required: true
               selector:
-                boolean: {}
+                select:
+                  mode: dropdown
+                  options:
+                    - label: Show
+                      value: "true"
+                    - label: Hide
+                      value: "false"
             color:
               label: Text Color
               selector:
@@ -106,8 +120,8 @@ sequence:
               {% set precision = rounding | int %}
               {% set value = ("%." ~ precision ~ "f") | format(value | float | round(precision)) %}
             {% endif %}
-            {% set unit = (state_attr(sensor_id, 'unit_of_measurement') or '') | replace('°', '') if (temperature.get("show_unit", false) | bool(false)) else '' %}
-            {% set value = value ~ ("°" if (temperature.get("degree", false) | bool(false)) else "") ~ unit %}
+            {% set unit = (state_attr(sensor_id, 'unit_of_measurement') or '') | replace('°', '') if (temperature.get("show_unit", true) | bool(true)) else '' %}
+            {% set value = value ~ ("°" if (temperature.get("degree", true) | bool(true)) else "") ~ unit %}
             {% set label = (temperature.get("label") or "") | trim %}
             {% if label %}
               {% set value = label ~ value %}
