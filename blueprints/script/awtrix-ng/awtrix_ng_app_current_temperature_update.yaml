@@ -33,10 +33,11 @@ blueprint:
       name: Temperatures
       description: >-
         Add an entry for each temperature to display, in display order.
-        Labels appear before readings (Inside becomes Inside: 72°F) and use
+        Labels appear directly before readings (Inside becomes Inside72.1) and use
         the entry's text color. Leave the label empty for no label.
-        Omitted settings use no rounding, a degree symbol, the sensor's unit,
-        and white text.
+        Readings default to one decimal place and white text. Turn on Degree
+        Symbol and Show Unit to include them. Turn on Use Custom Color to use
+        the color picker instead of white.
       default: []
       selector:
         object:
@@ -59,13 +60,14 @@ blueprint:
                   type: text
             rounding:
               label: Rounding
+              required: true
               selector:
                 select:
                   mode: dropdown
                   options:
+                    - "1"
                     - "No rounding"
                     - "0"
-                    - "1"
                     - "2"
             degree:
               label: Degree Symbol
@@ -75,8 +77,12 @@ blueprint:
               label: Show Unit (C or F)
               selector:
                 boolean: {}
+            use_custom_color:
+              label: Use Custom Color
+              selector:
+                boolean: {}
             color:
-              label: Text Color
+              label: Custom Text Color
               selector:
                 color_rgb: {}
 
@@ -99,18 +105,19 @@ sequence:
           {% set sensor_id = temperature.get("sensor_id", "") %}
           {% set value = states(sensor_id) if sensor_id else "unknown" %}
           {% if value not in ['unknown', 'unavailable', 'none'] %}
-            {% set rounding = temperature.get("rounding", "No rounding") %}
+            {% set rounding = (temperature.get("rounding") or "1") %}
             {% if rounding | string in ['0', '1', '2'] %}
               {% set precision = rounding | int %}
               {% set value = ("%." ~ precision ~ "f") | format(value | float | round(precision)) %}
             {% endif %}
-            {% set unit = (state_attr(sensor_id, 'unit_of_measurement') or '') | replace('°', '') if temperature.get("show_unit", true) else '' %}
-            {% set value = value ~ ("°" if temperature.get("degree", true) else "") ~ unit %}
+            {% set unit = (state_attr(sensor_id, 'unit_of_measurement') or '') | replace('°', '') if (temperature.get("show_unit", false) | bool(false)) else '' %}
+            {% set value = value ~ ("°" if (temperature.get("degree", false) | bool(false)) else "") ~ unit %}
             {% set label = (temperature.get("label") or "") | trim %}
             {% if label %}
-              {% set value = label ~ ": " ~ value %}
+              {% set value = label ~ value %}
             {% endif %}
-            {% set fragment = {"text": value, "color": (temperature.get("color") or [255, 255, 255])} %}
+            {% set color = (temperature.get("color") or [255, 255, 255]) if temperature.get("use_custom_color", false) | bool(false) else [255, 255, 255] %}
+            {% set fragment = {"text": value, "color": color} %}
             {% if ns.fragments %}
               {% set ns.fragments = ns.fragments + [{"text": " "}] %}
             {% endif %}
