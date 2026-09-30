@@ -35,9 +35,9 @@ blueprint:
         Add an entry for each temperature to display, in display order.
         Labels appear directly before readings (Inside becomes Inside72.1) and use
         the entry's text color. Leave the label empty for no label.
-        Readings default to one decimal place and white text. Turn on Degree
-        Symbol and Show Unit to include them. Turn on Use Custom Color to use
-        the color picker instead of white.
+        Readings default to one decimal place. Turn on Degree Symbol and
+        Show Unit to include them. An omitted color uses white; select white
+        explicitly if the color picker shows black.
       default: []
       selector:
         object:
@@ -77,12 +77,8 @@ blueprint:
               label: Show Unit (C or F)
               selector:
                 boolean: {}
-            use_custom_color:
-              label: Use Custom Color
-              selector:
-                boolean: {}
             color:
-              label: Custom Text Color
+              label: Text Color
               selector:
                 color_rgb: {}
 
@@ -116,7 +112,7 @@ sequence:
             {% if label %}
               {% set value = label ~ value %}
             {% endif %}
-            {% set color = (temperature.get("color") or [255, 255, 255]) if temperature.get("use_custom_color", false) | bool(false) else [255, 255, 255] %}
+            {% set color = temperature.get("color") or [255, 255, 255] %}
             {% set fragment = {"text": value, "color": color} %}
             {% if ns.fragments %}
               {% set ns.fragments = ns.fragments + [{"text": " "}] %}
