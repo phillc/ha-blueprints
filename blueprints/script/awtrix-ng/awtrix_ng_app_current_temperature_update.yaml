@@ -2,8 +2,8 @@ blueprint:
   name: AWTRIX NG App - Current Temperature - Update
   description: >-
     Publishes one to five selected temperature sensors as an AWTRIX NG pushed
-    app. Each sensor can be independently rounded and formatted with a degree
-    symbol, unit, and text color.
+    app. Each sensor can be independently rounded to 0, 1, or 2 decimal places
+    and formatted with a degree symbol, unit, and text color.
   domain: script
   source_url: https://github.com/phillc/ha-blueprints/blob/main/blueprints/script/awtrix-ng/awtrix_ng_app_current_temperature_update.yaml
   author: phillc
@@ -36,10 +36,17 @@ blueprint:
             - domain: sensor
               device_class: temperature
     temperature_1_round:
-      name: Sensor 1 - Round
-      default: false
+      name: Sensor 1 - Rounding
+      description: "Keep the original reading or round to the selected number of decimal places."
+      default: "No rounding"
       selector:
-        boolean:
+        select:
+          mode: dropdown
+          options:
+            - "No rounding"
+            - "0"
+            - "1"
+            - "2"
     temperature_1_degree:
       name: Sensor 1 - Degree Symbol
       default: true
@@ -66,10 +73,17 @@ blueprint:
             - domain: sensor
               device_class: temperature
     temperature_2_round:
-      name: Sensor 2 - Round
-      default: false
+      name: Sensor 2 - Rounding
+      description: "Keep the original reading or round to the selected number of decimal places."
+      default: "No rounding"
       selector:
-        boolean:
+        select:
+          mode: dropdown
+          options:
+            - "No rounding"
+            - "0"
+            - "1"
+            - "2"
     temperature_2_degree:
       name: Sensor 2 - Degree Symbol
       default: true
@@ -96,10 +110,17 @@ blueprint:
             - domain: sensor
               device_class: temperature
     temperature_3_round:
-      name: Sensor 3 - Round
-      default: false
+      name: Sensor 3 - Rounding
+      description: "Keep the original reading or round to the selected number of decimal places."
+      default: "No rounding"
       selector:
-        boolean:
+        select:
+          mode: dropdown
+          options:
+            - "No rounding"
+            - "0"
+            - "1"
+            - "2"
     temperature_3_degree:
       name: Sensor 3 - Degree Symbol
       default: true
@@ -126,10 +147,17 @@ blueprint:
             - domain: sensor
               device_class: temperature
     temperature_4_round:
-      name: Sensor 4 - Round
-      default: false
+      name: Sensor 4 - Rounding
+      description: "Keep the original reading or round to the selected number of decimal places."
+      default: "No rounding"
       selector:
-        boolean:
+        select:
+          mode: dropdown
+          options:
+            - "No rounding"
+            - "0"
+            - "1"
+            - "2"
     temperature_4_degree:
       name: Sensor 4 - Degree Symbol
       default: true
@@ -156,10 +184,17 @@ blueprint:
             - domain: sensor
               device_class: temperature
     temperature_5_round:
-      name: Sensor 5 - Round
-      default: false
+      name: Sensor 5 - Rounding
+      description: "Keep the original reading or round to the selected number of decimal places."
+      default: "No rounding"
       selector:
-        boolean:
+        select:
+          mode: dropdown
+          options:
+            - "No rounding"
+            - "0"
+            - "1"
+            - "2"
     temperature_5_degree:
       name: Sensor 5 - Degree Symbol
       default: true
@@ -216,7 +251,7 @@ sequence:
       topic: "{{ awtrix_topic_id }}/cmd/apps/pushed/{{ app_name }}"
       payload: >-
         {% set sensor_ids = [temperature_1_sensor_id, temperature_2_sensor_id, temperature_3_sensor_id, temperature_4_sensor_id, temperature_5_sensor_id] %}
-        {% set round_flags = [temperature_1_round, temperature_2_round, temperature_3_round, temperature_4_round, temperature_5_round] %}
+        {% set rounding_options = [temperature_1_round, temperature_2_round, temperature_3_round, temperature_4_round, temperature_5_round] %}
         {% set degree_flags = [temperature_1_degree, temperature_2_degree, temperature_3_degree, temperature_4_degree, temperature_5_degree] %}
         {% set units = [temperature_1_unit, temperature_2_unit, temperature_3_unit, temperature_4_unit, temperature_5_unit] %}
         {% set colors = [temperature_1_color, temperature_2_color, temperature_3_color, temperature_4_color, temperature_5_color] %}
@@ -224,8 +259,10 @@ sequence:
         {% for sensor_id in sensor_ids %}
           {% set value = states(sensor_id) if sensor_id else "unknown" %}
           {% if value not in ['unknown', 'unavailable', 'none'] %}
-            {% if round_flags[loop.index0] %}
-              {% set value = value | float | round(0) | int | string %}
+            {% set rounding = rounding_options[loop.index0] %}
+            {% if rounding is sameas true or rounding | string in ['0', '1', '2'] %}
+              {% set precision = 0 if rounding is sameas true else rounding | int %}
+              {% set value = ("%." ~ precision ~ "f") | format(value | float | round(precision)) %}
             {% endif %}
             {% set value = value ~ ("°" if degree_flags[loop.index0] else "") ~ (units[loop.index0] if units[loop.index0] else "") %}
             {% set fragment = {"text": value, "color": colors[loop.index0]} %}
